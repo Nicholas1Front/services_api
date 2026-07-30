@@ -97,7 +97,7 @@ Construir toda infraestrutura necessária antes da implementação da primeira r
 
 ---
 
-# FASE 0
+# FASE 0 [x]
 
 Planejamento
 
@@ -117,10 +117,10 @@ Definir toda arquitetura.
 
 ## Checklist
 
-- [ ] Escopo definido
-- [ ] Stack definida
-- [ ] Arquitetura definida
-- [ ] Documentação criada
+- [x] Escopo definido
+- [x] Stack definida
+- [x] Arquitetura definida
+- [x] Documentação criada
 
 ## Critério de conclusão
 
@@ -128,7 +128,7 @@ Toda decisão arquitetural documentada.
 
 ---
 
-# FASE 1
+# FASE 1 [x]
 
 Bootstrap
 
@@ -171,15 +171,15 @@ CJS
 
 ## Checklist
 
-- [ ] Projeto criado
-- [ ] TypeScript funcionando
-- [ ] Scripts configurados
-- [ ] Lint funcionando
-- [ ] Formatação funcionando
+- [x] Projeto criado
+- [x] TypeScript funcionando
+- [x] Scripts configurados
+- [x] Lint funcionando
+- [x] Formatação funcionando
 
 ---
 
-# FASE 2
+# FASE 2 [...]
 
 Docker
 

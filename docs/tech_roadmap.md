@@ -179,7 +179,7 @@ CJS
 
 ---
 
-# FASE 2 [...]
+# FASE 2 [X]
 
 Docker
 
@@ -229,15 +229,15 @@ Health Check
 
 ## Checklist
 
-- [ ] API sobe via Docker
-- [ ] PostgreSQL conectado
-- [ ] Redis conectado
-- [ ] Hot Reload funcionando
-- [ ] Persistência validada
+- [x] API sobe via Docker
+- [x] PostgreSQL conectado
+- [...] Redis conectado
+- [x] Hot Reload funcionando
+- [x] Persistência validada
 
 ---
 
-# FASE 3
+# FASE 3 [...]
 
 Arquitetura
 
@@ -267,19 +267,10 @@ Schemas
 
 ## Checklist
 
-- [ ] Estrutura criada
-- [ ] Alias configurados
-- [ ] Padrão de módulos definido
+- [x] Estrutura criada
+- [] Error handler criado
+- [] Modulo users criado
 
----
-
-# BLOCO 2
-
-Core
-
-Objetivo
-
-Implementar todas regras de negócio.
 
 ---
 

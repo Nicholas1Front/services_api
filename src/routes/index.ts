@@ -4,6 +4,7 @@ import { AppError } from '@/errors/AppError';
 
 // routes
 import authRoutes from '@/modules/auth/auth.routes';
+import usersRoutes from '@/modules/users/users.routes';
 
 export const routes = Router();
 
@@ -23,3 +24,4 @@ routes.get('/error', () => {
 });
 
 routes.use('/auth', authRoutes);
+routes.use('/users', usersRoutes);

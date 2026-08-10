@@ -2,6 +2,9 @@ import { Router } from 'express';
 
 import { AppError } from '@/errors/AppError';
 
+// routes
+import authRoutes from '@/modules/auth/auth.routes';
+
 export const routes = Router();
 
 routes.get('/health', (_, response) => {
@@ -18,3 +21,5 @@ routes.get('/error', () => {
     code: 'TEST_ERROR',
   });
 });
+
+routes.use('/auth', authRoutes);

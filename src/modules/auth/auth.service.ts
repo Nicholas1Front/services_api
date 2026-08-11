@@ -1,4 +1,9 @@
-import type {LoginDTO} from '@/modules/auth/auth.dto';
+import type {
+    LoginDTO,
+    LogoutDTO,
+    MeDTO
+} from '@/modules/auth/auth.dto';
+
 import {AppError} from '@/errors/AppError';
 import authRepository from '@/modules/auth/auth.repository';
 
@@ -48,6 +53,29 @@ class AuthService{
             email : user.email,
             role : user.role,
             token : token
+        }
+    }
+
+    async me(
+        {id} : MeDTO
+    ){
+        const user = await authRepository.findUserById(id);
+
+        if(!user){
+            throw new AppError({
+                message : "User not found",
+                statusCode : 404,
+                code : "USER_NOT_FOUND"
+            })
+        }
+
+        return {
+            id : user.id,
+            name : user.name,
+            email : user.email,
+            role : user.role,
+            createdAt : user.createdAt,
+            updatedAt : user.updatedAt
         }
     }
 }

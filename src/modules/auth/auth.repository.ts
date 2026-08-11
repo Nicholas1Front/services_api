@@ -12,6 +12,18 @@ class AuthRepository{
 
         return user
     }
+
+    async findUserById(
+        id : string
+    ){
+        const user = await prisma.user.findUnique({
+            where : {
+                id : id
+            }
+        })
+
+        return user
+    }
 }
 
 export default new AuthRepository();

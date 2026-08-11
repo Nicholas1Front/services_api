@@ -11,16 +11,10 @@ class UsersController{
         req : Request,
         res : Response
     ){
-        const {
-            name,
-            email,
-            password
-        } = createUserSchema.parse(req.body);
-
         const user = await usersService.createFirstAdmin({
-            name,
-            email,
-            password,
+            name : req.body.name,
+            email : req.body.email,
+            password : req.body.password,
             role : 'admin'
         })
 

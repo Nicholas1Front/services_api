@@ -15,4 +15,10 @@ router.get(
     authController.me
 )
 
+router.patch(
+    '/logout',
+    authMiddleware,
+    authController.logout
+)
+
 export default router;

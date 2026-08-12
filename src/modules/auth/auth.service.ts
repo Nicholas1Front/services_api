@@ -78,6 +78,29 @@ class AuthService{
             updatedAt : user.updatedAt
         }
     }
+
+    async logout(
+        {id} : LogoutDTO
+    ){
+        const user = await authRepository.findUserById(id);
+
+        if(!user){
+            throw new AppError({
+                message : "User not found",
+                statusCode : 404,
+                code : "USER_NOT_FOUND"
+            })
+        }
+        return {
+            message : "Logout successful",
+            user : {
+                id : user.id,
+                name : user.name,
+                email : user.email,
+                role : user.role
+            }
+        }
+    }
 }
 
 export default new AuthService();

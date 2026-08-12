@@ -46,6 +46,29 @@ class AuthController{
             data : result
         })
     }
+    async logout(
+        req : Request,
+        res : Response
+    ){
+        if(!req.user){
+            throw new AppError({
+                message : 'Unauthorized',
+                statusCode : 401,
+                code : 'UNAUTHORIZED'
+            })
+        }
+
+        const result = await authService.logout(
+            {
+                id : req.user.id
+            }
+        );
+
+        return res.status(200).json({
+            message : 'Logout successful',
+            data : result
+        })
+    }
 }
 
 export default new AuthController();

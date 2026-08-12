@@ -2,7 +2,8 @@ import usersRepository from '@/modules/users/users.repository';
 import type{
     createUserDTO,
     updateUserDTO,
-    updateUserRoleDTO
+    updateUserRoleDTO,
+    findUsersFiltersDTO
 } from '@/modules/users/users.dto';
 
 import {AppError} from '@/errors/AppError';
@@ -34,6 +35,63 @@ class UsersService{
         }
 
         return user
+    }
+
+    async createUser(
+        requesterRole : string,
+        {
+            name,
+            email,
+            password,
+            role
+        } : createUserDTO
+    ){
+        if(
+            requesterRole !== 'ADMIN'
+        ){
+            throw new AppError({
+                message : 'Forbidden access to create user',
+                statusCode : 403,
+                code : 'FORBIDDEN_ACCESS_CREATE_USER'
+            })
+        }
+
+        const existingUser = await usersRepository.findUserByEmail(email);
+
+        if(!existingUser){
+            throw new AppError({
+                message : 'User already exists',
+                statusCode : 400,
+                code : "USER_ALREADY_EXISTS"
+            })
+        }
+
+        if(!allowedUserRoles.includes(role)){
+            throw new AppError({
+                message : "Invalid user role",
+                statusCode : 400,
+                code : 'INVALID_USER_ROLE'
+            })
+        }
+
+        const passwordHashed = await bcrypt.hash(password, 10);
+
+        const createdUser = await usersRepository.createUser(
+            name,
+            email,
+            passwordHashed,
+            role
+        );
+
+        if(!createdUser){
+            throw new AppError({
+                message : "Error creating user - Internal Server Error",
+                statusCode : 500,
+                code : "ERROR_CREATING_USER_INTERNAL_SERVER_ERROR"
+            })
+        }
+
+        return createdUser
     }
 
     async updateUser(
@@ -206,6 +264,73 @@ class UsersService{
             createdAt : updatedUser.createdAt,
             updatedAt : updatedUser.updatedAt
         }
+    }
+
+    async findUsersByFilters(
+        requesterRole : string,
+        {
+            id,
+            name,
+            email,
+            role,
+            createdAt,
+            updatedAt
+        } : findUsersFiltersDTO
+    ){
+        if(requesterRole === 'ADMIN'){
+            throw new AppError({
+                message : 'Cannot get users - Forbidden access',
+                statusCode : 403,
+                code : 'CANNOT_GET_USERS_FORBBIDEN_ACCESS'
+            })
+        }
+
+        const filters = {
+            id,
+            name,
+            email,
+            role,
+            createdAt,
+            updatedAt
+        }
+
+        const users = await usersRepository.findUserByFilters(filters);
+
+        if(!users){
+            throw new AppError({
+                message : "Cannot find users - Internal Server Error",
+                statusCode : 500,
+                code : 'CANNOT_FIND_USERS_INTERNAL_SERVER_ERROR'
+            })
+        }
+
+        return users;
+    }
+
+    async deleteUser(
+        targetId : string,
+        requesterRole : string
+    ){
+
+        if(requesterRole === 'ADMIN'){
+            throw new AppError({
+                message : 'Cannot delete user - Forbidden access',
+                statusCode : 403,
+                code : 'CANNOT_DELETE_USER_FORBBIDEN_ACCESS'
+            })
+        }
+
+        const result = await usersRepository.deleteUser(targetId);
+
+        if(!result){
+            throw new AppError({
+                message : 'Internal server error',
+                statusCode : 500,
+                code : 'INTERNAL_SERVER_ERROR'
+            })
+        }
+
+        return true
     }
 }
 

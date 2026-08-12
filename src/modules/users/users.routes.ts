@@ -9,6 +9,12 @@ router.post(
     usersController.createFirstAdmin
 ) // Only a developer should be able to create the first admin user
 
+router.post(
+    '/create-user',
+    authMiddleware,
+    usersController.createUser
+)
+
 router.put(
     '/update-user/:id',
     authMiddleware,
@@ -20,5 +26,18 @@ router.patch(
     authMiddleware,
     usersController.updateUserRole
 )
+
+router.delete(
+    '/delete-user/:id',
+    authMiddleware,
+    usersController.deleteUser
+)
+
+router.get(
+    '/get-users',
+    authMiddleware,
+    usersController.findUsers
+)
+
 
 export default router;

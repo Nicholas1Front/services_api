@@ -66,6 +66,35 @@ class UsersRepository{
 
         return user
     }
+
+    async findUserByFilters(
+        filters : any
+    ){
+        const users = await prisma.user.findMany({
+            select : {
+                id : filters.id,
+                name : filters.name,
+                email : filters.email,
+                role : filters.role,
+                createdAt : filters.createdAt,
+                updatedAt : filters.updatedAt
+            }
+        })
+
+        return users
+    }
+
+    async deleteUser(
+        id : string
+    ){
+        await prisma.user.delete({
+            where : {
+                id
+            }
+        });
+
+        return true
+    }
 }
 
 export default new UsersRepository();

@@ -3,7 +3,8 @@ import usersService from '@/modules/users/users.service';
 import {
     createUserSchema,
     updateUserSchema,
-    updateUserRoleSchema
+    updateUserRoleSchema,
+    findUsersFiltersSchema
 } from '@/modules/users/users.schema';
 
 import {AppError} from '@/errors/AppError';
@@ -27,6 +28,37 @@ class UsersController{
             data : user
         })
     }
+
+    async createUser(
+        req : Request,
+        res : Response
+    ){
+        if(!req.user){
+            throw new AppError({
+                message : 'Unauthorized',
+                statusCode : 401,
+                code : 'UNAUTHORIZED'
+            })
+        }
+
+        const data = createUserSchema.parse(req.body);
+
+        const user = await usersService.createUser(
+            req.user.role,
+            {
+                name : data.name,
+                email : data.email,
+                password : data.password,
+                role : data.role
+            }
+        )
+
+        return res.status(200).json({
+            message : "User created successfully",
+            data : user
+        })
+    }
+
     async updateUser(
         req : Request,
         res : Response
@@ -90,6 +122,56 @@ class UsersController{
         return res.status(200).json({
             message : 'User role updated successfully',
             data : user
+        })
+    }
+
+    async findUsers(
+        req : Request,
+        res : Response
+    ){
+        if(!req.user){
+            throw new AppError({
+                message : 'Unauthorized',
+                statusCode : 401,
+                code : 'UNAUTHORIZED'
+            })
+        }
+
+        const filters = findUsersFiltersSchema.parse(req.query);
+
+        const users = await usersService.findUsersByFilters(
+            req.user.role,
+            {
+                ...filters
+            }
+        )
+
+        return res.status(200).json({
+            message : "Users retrived successfully",
+            data : users
+        })
+    }
+
+    async deleteUser(
+        req : Request,
+        res : Response
+    ){
+        if(!req.user){
+            throw new AppError({
+                message : 'Unauthorized',
+                statusCode : 401,
+                code : 'UNAUTHORIZED'
+            })
+        }
+
+        await usersService.deleteUser(
+            req.params.id as string,
+            req.user.role
+        )
+
+        return res.status(200).json({
+            message : "User deleted successfully",
+            data : true
         })
     }
 }

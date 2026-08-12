@@ -19,3 +19,15 @@ export const updateUserSchema = z.object({
 export const updateUserRoleSchema = z.object({
     role : z.string().min(3).max(40)
 })
+
+export const findUsersFiltersSchema = z.object({
+    id : z.string().optional(),
+    name : z.string().optional(),
+    email : z.string().optional(),
+    role : z.string().toUpperCase().optional(),
+    createdAt : z.coerce.date().optional(),
+    updatedAt : z.coerce.date().optional()
+}).refine(
+    data => Object.keys(data).length > 0,
+    {message : "At least one field must be provided for get notes"}
+)

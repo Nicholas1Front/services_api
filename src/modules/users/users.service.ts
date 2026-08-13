@@ -58,7 +58,7 @@ class UsersService{
 
         const existingUser = await usersRepository.findUserByEmail(email);
 
-        if(!existingUser){
+        if(existingUser){
             throw new AppError({
                 message : 'User already exists',
                 statusCode : 400,
@@ -146,8 +146,8 @@ class UsersService{
 
         if(password !== undefined){
             const passwordMatch = await bcrypt.compare(
-                existingUser.passwordHash,
-                password
+                password,
+                existingUser.passwordHash
             );
 
             if(passwordMatch){
@@ -268,30 +268,14 @@ class UsersService{
 
     async findUsersByFilters(
         requesterRole : string,
-        {
-            id,
-            name,
-            email,
-            role,
-            createdAt,
-            updatedAt
-        } : findUsersFiltersDTO
+        filters : findUsersFiltersDTO
     ){
-        if(requesterRole === 'ADMIN'){
+        if(requesterRole !== 'ADMIN'){
             throw new AppError({
                 message : 'Cannot get users - Forbidden access',
                 statusCode : 403,
                 code : 'CANNOT_GET_USERS_FORBBIDEN_ACCESS'
             })
-        }
-
-        const filters = {
-            id,
-            name,
-            email,
-            role,
-            createdAt,
-            updatedAt
         }
 
         const users = await usersRepository.findUserByFilters(filters);
@@ -312,7 +296,7 @@ class UsersService{
         requesterRole : string
     ){
 
-        if(requesterRole === 'ADMIN'){
+        if(requesterRole !== 'ADMIN'){
             throw new AppError({
                 message : 'Cannot delete user - Forbidden access',
                 statusCode : 403,

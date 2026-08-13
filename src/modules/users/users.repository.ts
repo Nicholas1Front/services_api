@@ -25,6 +25,23 @@ class UsersRepository{
 
         return user
     }
+    
+    async findUserByFilters(
+        filters : any
+    ){
+        const users = await prisma.user.findMany({
+            where : {
+                id : filters.id,
+                name : filters.name,
+                email : filters.email,
+                role : filters.role,
+                createdAt : filters.createdAt,
+                updatedAt : filters.updatedAt
+            }
+        })
+
+        return users
+    }
 
     async createUser(
         name : string,
@@ -65,23 +82,6 @@ class UsersRepository{
         })
 
         return user
-    }
-
-    async findUserByFilters(
-        filters : any
-    ){
-        const users = await prisma.user.findMany({
-            select : {
-                id : filters.id,
-                name : filters.name,
-                email : filters.email,
-                role : filters.role,
-                createdAt : filters.createdAt,
-                updatedAt : filters.updatedAt
-            }
-        })
-
-        return users
     }
 
     async deleteUser(

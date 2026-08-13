@@ -141,9 +141,7 @@ class UsersController{
 
         const users = await usersService.findUsersByFilters(
             req.user.role,
-            {
-                ...filters
-            }
+            filters
         )
 
         return res.status(200).json({

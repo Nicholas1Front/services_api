@@ -16,5 +16,37 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
+  servicesOwned Service[]
+
   @@map("users")
+}
+
+model Service {
+  id String @id @default(uuid())
+  title String
+  description String? // description is optional
+  status String
+  ownerId String @map("owner_id")
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  owner       User     @relation(fields: [ownerId], references: [id])
+  visibility ServiceVisibility[]
+
+  @@map("services")
+}
+
+model ServiceVisibility {
+  id        String   @id @default(uuid())
+
+  serviceId String   @map("service_id")
+  role      String
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  service   Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@unique([serviceId, role])
+  @@map("service_visibility")
 }

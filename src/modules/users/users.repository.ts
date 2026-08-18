@@ -54,9 +54,7 @@ class UsersRepository{
                 name,
                 email,
                 passwordHash : password,
-                role,
-                createdAt : new Date(),
-                updatedAt : new Date()
+                role
             }
         })
 

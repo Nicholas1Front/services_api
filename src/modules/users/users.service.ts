@@ -23,7 +23,7 @@ class UsersService{
             name,
             email,
             passwordHash,
-            'admin'
+            'ADMIN'
         )
 
         if(!user){

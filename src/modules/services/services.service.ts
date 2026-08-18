@@ -124,7 +124,22 @@ class ServicesService{
             })
         }
 
-        return updatedService
+        const visibilityFromService = await servicesRepository.getVisibilityByFilters({
+            serviceId : serviceId
+        });
+
+        if(!visibilityFromService){
+            throw new AppError({
+                message : "Internal server error",
+                statusCode : 500,
+                code : 'INTERNAL_SERVER_ERROR'
+            })
+        }
+
+        return {
+            service : updatedService,
+            visibility : visibilityFromService
+        }
     }
 
     async updateServiceStatus(
@@ -171,7 +186,22 @@ class ServicesService{
             })
         }
 
-        return updatedService
+        const visibilityFromService = await servicesRepository.getVisibilityByFilters({
+            serviceId : serviceId
+        });
+
+        if(!visibilityFromService){
+            throw new AppError({
+                message : "Internal server error",
+                statusCode : 500,
+                code : 'INTERNAL_SERVER_ERROR'
+            })
+        }
+
+        return {
+            service : updatedService,
+            visibility : visibilityFromService
+        }
     }
 
     async getServicesByFilters(

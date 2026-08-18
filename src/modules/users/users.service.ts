@@ -104,13 +104,14 @@ class UsersService{
             password
         } : updateUserDTO
     ){
-        if(
-            requesterRole !== 'ADMIN' || targetId !== requesterId
-        ){
+        const isAdmin = requesterRole === 'ADMIN';
+        const isOwner = requesterId === targetId;
+
+        if(!isAdmin && !isOwner){
             throw new AppError({
                 message : 'Forbidden access to update user',
                 statusCode : 403,
-                code : 'FORBIDDEN_ACCESS'
+                code : 'FORBIDDEN_ACCESS_UPDATE_USER'
             })
         }
 

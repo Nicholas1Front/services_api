@@ -228,26 +228,18 @@ class ServicesService{
             })
         }
 
-        services.forEach(async(service)=>{
-            const permissions = await servicesRepository.getVisibilityByFilters({
-                serviceId : service.id
+        results = await Promise.all(
+            services.map(async(service)=>{
+                const visibility = await servicesRepository.getVisibilityByFilters({
+                    serviceId : service.id
+                });
+
+                return {
+                    service : service,
+                    visibility : visibility
+                }
             })
-
-            if(!permissions){
-                throw new AppError({
-                    message : 'Internal server error',
-                    statusCode : 500,
-                    code : 'INTERNAL_SERVER_ERROR'
-                })
-            }
-
-            const result = {
-                service : service,
-                visibility : permissions
-            }
-
-            results.push(result);
-        })
+        )
 
         return results
     }
@@ -269,19 +261,11 @@ class ServicesService{
 
         let services = new Array;
 
-        permissions.forEach(async(permission)=>{
-            const service = await servicesRepository.getServiceById(permission.serviceId);
-
-            if(!service){
-                throw new AppError({
-                    message : 'Internal server error',
-                    statusCode : 500,
-                    code : 'INTERNAL_SERVER_ERROR'
-                })
-            }
-
-            services.push(service);
-        })
+        services = await Promise.all(
+            permissions.map(async(permission)=>{
+                return await servicesRepository.getServiceById(permission.serviceId)
+            })
+        )
 
         return services;
     }
@@ -392,7 +376,7 @@ class ServicesService{
 
         return {
             service : existingService,
-            visibility : [...rolesAlreadyVisible, ...addedVisibility]
+            visibility : [...visibilityFromService, ...addedVisibility]
         }
 
     }

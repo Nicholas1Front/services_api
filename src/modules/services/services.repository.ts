@@ -23,22 +23,20 @@ class ServicesRepository{
             }
         })
 
-        let serviceVisibility = new Array;
-
-        data.visibilityRoles.forEach(async (role)=>{
-            const permission = await prisma.serviceVisibility.create({
-                data : {
-                    role : role,
-                    service : {
-                        connect : {
-                            id : service.id
+        let serviceVisibility = await Promise.all(
+            data.visibilityRoles.map((role:string)=>{
+                return prisma.serviceVisibility.create({
+                    data : {
+                        role : role,
+                        service : {
+                            connect : {
+                                id : service.id
+                            }
                         }
                     }
-                }
+                })
             })
-
-            serviceVisibility.push(permission);
-        })
+        )
 
         return {
             service_data : service,
@@ -52,20 +50,20 @@ class ServicesRepository{
     ){
         let serviceVisibility = new Array;
 
-        roles.forEach(async (role:string)=>{
-            const permission = await prisma.serviceVisibility.create({
-                data : {
-                    role : role,
-                    service : {
-                        connect : {
-                            id : serviceId
+        serviceVisibility = await Promise.all(
+            roles.map((role:string)=>{
+                return prisma.serviceVisibility.create({
+                    data : {
+                        role : role,
+                        service : {
+                            connect : {
+                                id : serviceId
+                            }
                         }
                     }
-                }
+                })
             })
-
-            serviceVisibility.push(permission);
-        })
+        )
 
         return serviceVisibility
     }
@@ -81,8 +79,7 @@ class ServicesRepository{
             data : {
                 title : data.title,
                 description : data.description,
-                status : data.status,
-                updatedAt : new Date(),
+                status : data.status
             }
         })
 
@@ -98,8 +95,7 @@ class ServicesRepository{
                 id : serviceId
             },
             data : {
-                status,
-                updatedAt : new Date(),
+                status
             }
         });
 
@@ -153,7 +149,7 @@ class ServicesRepository{
     async deleteServiceById(
         id : string
     ){
-        await prisma.service.deleteMany({
+        await prisma.service.delete({
             where : {
                 id
             }
@@ -166,16 +162,17 @@ class ServicesRepository{
         serviceId : string,
         roles : any 
     ){
-        roles.forEach(async (role:string)=>{
-            await prisma.serviceVisibility.deleteMany({
-                where : {
-                    serviceId,
-                    role
-                }
+        let servicesDeleted = await Promise.all(
+            roles.map((role:string)=>{
+                return prisma.serviceVisibility.deleteMany({
+                    where : {
+                        role : role,
+                        serviceId : serviceId
+                    }
+                })
             })
-        })
-
-        return true
+        )
+        return servicesDeleted
     }
 }
 

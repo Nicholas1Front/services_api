@@ -18,35 +18,79 @@ model User {
 
   servicesOwned Service[]
 
+  tasksCreated  Task[] @relation("task_creator")
+  tasksAssigned Task[] @relation("task_assigned")
+
   @@map("users")
 }
 
 model Service {
-  id String @id @default(uuid())
-  title String
-  description String? // description is optional
-  status String
-  ownerId String @map("owner_id")
-
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  status      String
+  ownerId     String   @map("owner_id")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  owner       User     @relation(fields: [ownerId], references: [id])
+  owner      User                @relation(fields: [ownerId], references: [id])
   visibility ServiceVisibility[]
+  tasks      Task[]
 
   @@map("services")
 }
 
 model ServiceVisibility {
   id        String   @id @default(uuid())
-
   serviceId String   @map("service_id")
   role      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@unique([serviceId, role])
+
+  @@map("service_visibility")
+}
+
+model Task {
+  id String @id @default(uuid())
+
+  serviceId String @map("service_id")
+
+  title       String
+  description String
+  status      String
+
+  creatorId    String  @map("creator_id")
+  assignedToId String? @map("assigned_to_id")
+
+  deliveryDate DateTime? @map("delivery_date")
+  observations String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  service    Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  creator    User    @relation("task_creator", fields: [creatorId], references: [id])
+  assignedTo User?   @relation("task_assigned", fields: [assignedToId], references: [id])
+
+  visibility TaskVisibility[]
+
+  @@map("tasks")
+}
+
+model TaskVisibility {
+  id String @id @default(uuid())
+
+  taskId String @map("task_id")
+  role   String
 
   createdAt DateTime @default(now()) @map("created_at")
 
-  service   Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
-  @@unique([serviceId, role])
-  @@map("service_visibility")
+  @@unique([taskId, role])
+
+  @@map("task_visibility")
 }

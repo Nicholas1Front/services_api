@@ -1,6 +1,6 @@
 export const allowedServicesStatus = [
     'PLANNED',
-    'IN_PROGRESS',
+    'PROGRESS',
     'BLOCKED',
     'ON_HOLD',
     'COMPLETED',

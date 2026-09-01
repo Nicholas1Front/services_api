@@ -21,6 +21,8 @@ model User {
   tasksCreated  Task[] @relation("task_creator")
   tasksAssigned Task[] @relation("task_assigned")
 
+  notes Note[]
+
   @@map("users")
 }
 
@@ -93,4 +95,25 @@ model TaskVisibility {
   @@unique([taskId, role])
 
   @@map("task_visibility")
+}
+
+model Note {
+  id String @id @default(uuid())
+
+  title   String
+  content String
+
+  entityId    String   @map("entity_id")
+  entityTable String @map("entity_table")
+
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([entityId])
+
+  @@map("notes")
 }

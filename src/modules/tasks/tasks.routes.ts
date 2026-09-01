@@ -13,22 +13,22 @@ router.post(
 )
 
 router.patch(
-    '/add-visibility-to-task',
+    '/add-visibility-to-task/:id',
     tasksController.addVisibilityToTask
 )
 
 router.put(
-    '/update-task-info',
+    '/update-task-info/:id',
     tasksController.updateTaskInfo
 )
 
 router.patch(
-    '/update-task-status',
+    '/update-task-status/:id',
     tasksController.updateTaskStatus
 )
 
 router.patch(
-    '/update-task-assigned-user',
+    '/update-task-assigned-user/:taskId/:userId',
     tasksController.updateTaskAssignedUser
 )
 
@@ -43,7 +43,7 @@ router.get(
 )
 
 router.delete(
-    '/delete-task-by-id',
+    '/delete-task-by-id/:id',
     tasksController.deleteTaskById
 )
 

@@ -18,6 +18,8 @@ export const updateNoteSchema = z.object({
 )
 
 export const getNotesFiltersSchema = z.object({
+    id : z.string().min(3).optional(),
+    userId : z.string().min(3).optional(),
     title : z.string().min(3).optional(),
     content : z.string().min(3).optional(),
     entityId: z.string().min(3).optional(),

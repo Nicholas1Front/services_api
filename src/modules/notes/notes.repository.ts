@@ -70,9 +70,7 @@ class NotesRepository{
                 title : filters.title,
                 content : filters.content,
                 entityId : filters.entityId,
-                entityTable : filters.entityTable,
-                createdAt : filters.createdAt,
-                updatedAt : filters.updatedAt
+                entityTable : filters.entityTable
             }
        })
 

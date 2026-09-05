@@ -7,6 +7,7 @@ import authRoutes from '@/modules/auth/auth.routes';
 import usersRoutes from '@/modules/users/users.routes';
 import servicesRoutes from '@/modules/services/services.routes';
 import tasksRoutes from '@/modules/tasks/tasks.routes';
+import notesRoutes from '@/modules/notes/notes.routes';
 
 export const routes = Router();
 
@@ -29,3 +30,4 @@ routes.use('/auth', authRoutes);
 routes.use('/users', usersRoutes);
 routes.use('/services', servicesRoutes);
 routes.use('/tasks', tasksRoutes);
+routes.use('/notes', notesRoutes);

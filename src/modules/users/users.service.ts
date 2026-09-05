@@ -15,7 +15,9 @@ import bcrypt from 'bcrypt';
 
 class UsersService{
     async createFirstAdmin(
-        {name, email, password} : createUserDTO
+        name:string,
+        email:string,
+        password:string
     ){
         const passwordHash = await bcrypt.hash(password, 10);
 

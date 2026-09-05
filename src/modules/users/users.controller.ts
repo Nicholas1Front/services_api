@@ -16,12 +16,11 @@ class UsersController{
         req : Request,
         res : Response
     ){
-        const user = await usersService.createFirstAdmin({
-            name : req.body.name,
-            email : req.body.email,
-            password : req.body.password,
-            role : 'admin'
-        })
+        const user = await usersService.createFirstAdmin(
+            req.body.name,
+            req.body.email,
+            req.body.password
+        )
 
         return res.status(201).json({
             message : 'First admin user created successfully',

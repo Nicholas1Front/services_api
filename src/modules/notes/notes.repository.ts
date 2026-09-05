@@ -16,6 +16,11 @@ class NotesRepository{
                 where : {
                     id : entityId
                 }
+            }),
+            await prisma.user.findUnique({
+                where : {
+                    id : entityId
+                }
             })
         ]);
 

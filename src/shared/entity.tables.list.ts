@@ -1,4 +1,5 @@
 export const tablesList = [
     'services',
-    'tasks'
+    'tasks',
+    'users'
 ]

@@ -10,6 +10,9 @@ import type {
 
 import {tablesList} from '@/shared/entity.tables.list';
 
+import {cacheKeys} from '@/shared/cache/cache.keys';
+import {cacheService} from '@/shared/cache/cache.service';
+
 class NotesService{
     async createNote(
         data : createNoteDTO,
@@ -128,6 +131,18 @@ class NotesService{
             })
         }
 
+        const refinedFilters = Object.fromEntries(
+            Object.entries(filters).filter(([_, value]) => value !== undefined)
+        );
+
+        const cacheKey = cacheKeys.notes.filters(refinedFilters);
+
+        const cachedNotes = await cacheService.get(cacheKey);
+
+        if(cachedNotes){
+            return cachedNotes
+        }
+
         const notes = await notesRepository.getNotesByFilters(filters);
 
         if(!notes){
@@ -144,6 +159,14 @@ class NotesService{
     async getUserNotes(
         userId : string
     ){
+        const cacheKey = cacheKeys.notes.user(userId);
+
+        const cachedNotes = await cacheService.get(cacheKey);
+
+        if(cachedNotes){
+            return cachedNotes
+        }
+
         const notes = await notesRepository.getUserNotes(userId);
 
         if(!notes){
@@ -153,6 +176,8 @@ class NotesService{
                 code : 'NOTES_NOT_FOUND'
             })
         }
+
+        await cacheService.set(cacheKey, notes)
 
         return notes
     }

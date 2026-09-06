@@ -140,7 +140,10 @@ class NotesService{
         const cachedNotes = await cacheService.get(cacheKey);
 
         if(cachedNotes){
-            return cachedNotes
+            return {
+                cache : `Returning cached notes`,
+                data : cachedNotes
+            }
         }
 
         const notes = await notesRepository.getNotesByFilters(filters);
@@ -164,7 +167,10 @@ class NotesService{
         const cachedNotes = await cacheService.get(cacheKey);
 
         if(cachedNotes){
-            return cachedNotes
+            return {
+                cache : `Returning cached notes for user ${userId}`,
+                data : cachedNotes
+            }
         }
 
         const notes = await notesRepository.getUserNotes(userId);

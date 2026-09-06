@@ -5,7 +5,8 @@
     "moduleResolution": "bundler",
     "target": "esnext",
     "types": [
-      "node"
+      "node",
+      "jest"
     ],
     // For nodejs:
     "lib": ["esnext"],

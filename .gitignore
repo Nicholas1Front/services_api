@@ -1,15 +1,22 @@
-node_modules
+node_modules/
+**/node_modules/
 
-dist
+dist/
+**/dist/
 
 .env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
 
-coverage
-
-.vscode
-
+coverage/
+.vscode/
 *.log
+
 /src/generated/prisma
+/backend/generated/prisma
 
 .agents
 .claude

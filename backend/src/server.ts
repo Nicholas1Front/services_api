@@ -31,7 +31,7 @@ async function startServer() {
 
       await Promise.allSettled([
         prisma.$disconnect(),
-        redis.quit(),
+        redis.close(),
       ]);
 
       process.exit(error ? 1 : 0);
@@ -47,8 +47,8 @@ startServer().catch(async (error: unknown) => {
 
   await Promise.allSettled([
     prisma.$disconnect(),
-    redis.disconnect(),
   ]);
+  redis.destroy();
 
   process.exit(1);
 });

@@ -55,6 +55,7 @@ app.get("/health/ready", async (_req, res) => {
   }
 });
 
+// Keep the error handler after every route and middleware.
 app.use(errorMiddleware);
 
 export default app;

@@ -15,18 +15,32 @@ export const errorMiddleware: ErrorRequestHandler = (
   }
 
   const isAppError = error instanceof AppError;
-  const statusCode = isAppError ? error.statusCode : 500;
+  const isInvalidJson =
+    error instanceof SyntaxError &&
+    "status" in error &&
+    error.status === 400;
+
+  const statusCode = isAppError ? error.statusCode : isInvalidJson ? 400 : 500;
+  const code = isAppError
+    ? error.code
+    : isInvalidJson
+      ? "INVALID_JSON"
+      : "INTERNAL_SERVER_ERROR";
+
   const message =
-    isAppError || env.NODE_ENV !== "production"
-      ? error instanceof Error
-        ? error.message
-        : String(error)
-      : "Internal server error";
+    isAppError || isInvalidJson
+      ? error.message
+      : env.NODE_ENV === "production"
+        ? "Internal server error"
+        : error instanceof Error
+          ? error.message
+          : String(error);
 
   logger.error(
     {
       err: error,
       statusCode,
+      code,
       method: req.method,
       path: req.originalUrl,
     },
@@ -36,5 +50,6 @@ export const errorMiddleware: ErrorRequestHandler = (
   res.status(statusCode).json({
     status: "error",
     message,
+    code,
   });
 };

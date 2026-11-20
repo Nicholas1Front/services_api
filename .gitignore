@@ -17,6 +17,7 @@ coverage/
 
 /src/generated/prisma
 /backend/generated/prisma
+/backend/src/generated/prisma
 
 .agents
 .claude

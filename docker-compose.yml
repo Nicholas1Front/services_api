@@ -37,6 +37,8 @@ services:
       PORT: 3000
       DATABASE_URL: postgresql://${POSTGRES_USER:-services_api}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-services_api}?schema=public
       REDIS_URL: redis://redis:6379
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
     ports:
       - "3000:3000"
     volumes:

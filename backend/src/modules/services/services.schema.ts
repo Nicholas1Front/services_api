@@ -4,6 +4,10 @@ import { allowedServicesStatus } from "./shared/allowedServicesStatus.js";
 
 const serviceTitleSchema = z.string().trim().min(1).max(150);
 const serviceDescriptionSchema = z.string().trim().max(2000);
+const serviceVisibilityRolesSchema = z.array(z.enum(allowedRoles));
+
+const ensureUniqueRoles = (roles: string[]) =>
+  new Set(roles).size === roles.length;
 
 export const createServiceSchema = z.object({
   title: serviceTitleSchema,
@@ -20,17 +24,17 @@ export const updateServiceSchema = z.object({
   { message: "At least one field must be provided" },
 );
 
-const visibilityRolesSchema = z.array(z.enum(allowedRoles)).refine(
-  (roles) => new Set(roles).size === roles.length,
-  { message: "Roles must not contain duplicates" },
-);
-
 export const addServiceVisibilitySchema = z.object({
-  roles: visibilityRolesSchema.min(1),
+  roles: serviceVisibilityRolesSchema
+    .min(1)
+    .refine(ensureUniqueRoles, { message: "Roles must not contain duplicates" }),
 }).strict();
 
 export const updateServiceVisibilitySchema = z.object({
-  roles: visibilityRolesSchema,
+  roles: serviceVisibilityRolesSchema.refine(
+    ensureUniqueRoles,
+    { message: "Roles must not contain duplicates" },
+  ),
 }).strict();
 
 export const findServicesByFiltersSchema = z.object({

@@ -6,7 +6,6 @@ import { allowedRoles, type UserRole } from "./shared/allowedRoles.js";
 import type {
   CreateUserInput,
   FindUsersByFiltersInput,
-  UpdateOwnUserInput,
   UpdateUserInput,
 } from "./users.schema.js";
 import { usersRepository } from "./users.repository.js";
@@ -75,7 +74,7 @@ export const usersService = {
   async updateUser(
     actor: AuthenticatedUser,
     userId: string,
-    input: UpdateOwnUserInput | UpdateUserInput,
+    input: UpdateUserInput,
   ) {
     const isOwner = actor.id === userId;
     const isAdmin = actor.role === "ADMIN";

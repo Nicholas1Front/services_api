@@ -110,6 +110,9 @@ export const servicesRepository = {
       }
     });
 
-    return this.findById(serviceId);
+    return prisma.service.findUnique({
+      where: { id: serviceId },
+      include: serviceInclude,
+    });
   },
 };

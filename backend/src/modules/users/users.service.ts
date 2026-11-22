@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { AppError } from "../../config/app-error.js";
 import type { AuthenticatedUser } from "../../types/auth.js";
+import { removeUndefinedProperties } from "../../shared/removeUndefinedProperties.js";
 import { allowedRoles, type UserRole } from "./shared/allowedRoles.js";
 import type {
   CreateUserInput,
@@ -12,7 +13,19 @@ import { usersRepository } from "./users.repository.js";
 
 const PASSWORD_SALT_ROUNDS = 12;
 
-const throwIfPrismaError = (error: unknown): never => {
+const ensureAdmin = (actor: AuthenticatedUser) => {
+  if (actor.role !== "ADMIN") {
+    throw new AppError("Administrator access required", 403, "FORBIDDEN");
+  }
+};
+
+const ensureAllowedRole = (role: string) => {
+  if (!allowedRoles.includes(role as UserRole)) {
+    throw new AppError("Invalid user role", 400, "INVALID_USER_ROLE");
+  }
+};
+
+const handlePrismaError = (error: unknown): never => {
   if (error && typeof error === "object" && "code" in error) {
     if (error.code === "P2002") {
       throw new AppError("Email is already in use", 409, "EMAIL_ALREADY_EXISTS");
@@ -30,29 +43,9 @@ const throwIfPrismaError = (error: unknown): never => {
   throw error;
 };
 
-const ensureAdmin = async (actor: AuthenticatedUser) => {
-  const currentUser = await usersRepository.findRoleById(actor.id);
-
-  if (!currentUser) {
-    throw new AppError("User not found", 401, "AUTHENTICATED_USER_NOT_FOUND");
-  }
-
-  if (currentUser.role !== "ADMIN") {
-    throw new AppError("Administrator access required", 403, "FORBIDDEN");
-  }
-};
-
-const ensureAllowedRole = (role: string): role is UserRole => {
-  if (!allowedRoles.includes(role as UserRole)) {
-    throw new AppError("Invalid user role", 400, "INVALID_USER_ROLE");
-  }
-
-  return true;
-};
-
 export const usersService = {
   async createUser(actor: AuthenticatedUser, input: CreateUserInput) {
-    await ensureAdmin(actor);
+    ensureAdmin(actor);
     ensureAllowedRole(input.role);
 
     const passwordHash = await bcrypt.hash(input.password, PASSWORD_SALT_ROUNDS);
@@ -65,7 +58,7 @@ export const usersService = {
         role: input.role,
       });
     } catch (error) {
-      throwIfPrismaError(error);
+      handlePrismaError(error);
     }
   },
 
@@ -79,25 +72,50 @@ export const usersService = {
     return user;
   },
 
-  async updateOwnProfile(actor: AuthenticatedUser, input: UpdateOwnUserInput) {
-    const data: { name?: string; email?: string; passwordHash?: string } = {
-      ...(input.name !== undefined && { name: input.name }),
-      ...(input.email !== undefined && { email: input.email }),
-    };
+  async updateUser(
+    actor: AuthenticatedUser,
+    userId: string,
+    input: UpdateOwnUserInput | UpdateUserInput,
+  ) {
+    const isOwner = actor.id === userId;
+    const isAdmin = actor.role === "ADMIN";
 
-    if (input.password) {
-      data.passwordHash = await bcrypt.hash(input.password, PASSWORD_SALT_ROUNDS);
+    if (!isOwner && !isAdmin) {
+      throw new AppError("You cannot update this user", 403, "FORBIDDEN");
     }
 
+    if (input.role !== undefined) {
+      if (!isAdmin) {
+        throw new AppError("Only administrators can change user roles", 403, "FORBIDDEN");
+      }
+
+      if (isOwner) {
+        throw new AppError("You cannot change your own role", 400, "SELF_ROLE_UPDATE_NOT_ALLOWED");
+      }
+
+      ensureAllowedRole(input.role);
+    }
+
+    const passwordHash = input.password
+      ? await bcrypt.hash(input.password, PASSWORD_SALT_ROUNDS)
+      : undefined;
+
+    const data = removeUndefinedProperties({
+      name: input.name,
+      email: input.email,
+      passwordHash,
+      role: input.role,
+    });
+
     try {
-      return await usersRepository.update(actor.id, data);
+      return await usersRepository.update(userId, data);
     } catch (error) {
-      throwIfPrismaError(error);
+      handlePrismaError(error);
     }
   },
 
   async findUsersByFilters(actor: AuthenticatedUser, filters: FindUsersByFiltersInput) {
-    await ensureAdmin(actor);
+    ensureAdmin(actor);
 
     const [users, total] = await usersRepository.findByFilters(filters);
 
@@ -113,7 +131,7 @@ export const usersService = {
   },
 
   async findUserById(actor: AuthenticatedUser, userId: string) {
-    await ensureAdmin(actor);
+    ensureAdmin(actor);
 
     const user = await usersRepository.findById(userId);
 
@@ -124,41 +142,8 @@ export const usersService = {
     return user;
   },
 
-  async updateUser(actor: AuthenticatedUser, userId: string, input: UpdateUserInput) {
-    await ensureAdmin(actor);
-
-    if (input.role !== undefined) {
-      ensureAllowedRole(input.role);
-
-      if (userId === actor.id) {
-        throw new AppError("Use your own profile endpoint to update personal data", 400, "SELF_ROLE_UPDATE_NOT_ALLOWED");
-      }
-    }
-
-    const data: {
-      name?: string;
-      email?: string;
-      passwordHash?: string;
-      role?: string;
-    } = {
-      ...(input.name !== undefined && { name: input.name }),
-      ...(input.email !== undefined && { email: input.email }),
-      ...(input.role !== undefined && { role: input.role }),
-    };
-
-    if (input.password) {
-      data.passwordHash = await bcrypt.hash(input.password, PASSWORD_SALT_ROUNDS);
-    }
-
-    try {
-      return await usersRepository.update(userId, data);
-    } catch (error) {
-      throwIfPrismaError(error);
-    }
-  },
-
   async deleteUser(actor: AuthenticatedUser, userId: string) {
-    await ensureAdmin(actor);
+    ensureAdmin(actor);
 
     if (userId === actor.id) {
       throw new AppError("You cannot delete your own account", 400, "SELF_DELETE_NOT_ALLOWED");
@@ -167,7 +152,7 @@ export const usersService = {
     try {
       return await usersRepository.delete(userId);
     } catch (error) {
-      throwIfPrismaError(error);
+      handlePrismaError(error);
     }
   },
 };

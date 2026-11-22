@@ -5,6 +5,12 @@ const userNameSchema = z.string().trim().min(1).max(100);
 const userEmailSchema = z.string().trim().email().toLowerCase();
 const userPasswordSchema = z.string().min(8).max(72);
 
+const updateUserFieldsSchema = z.object({
+  name: userNameSchema.optional(),
+  email: userEmailSchema.optional(),
+  password: userPasswordSchema.optional(),
+});
+
 export const createUserSchema = z.object({
   name: userNameSchema,
   email: userEmailSchema,
@@ -12,17 +18,17 @@ export const createUserSchema = z.object({
   role: z.string().trim().min(1),
 });
 
-export const updateOwnUserSchema = z.object({
-  name: userNameSchema.optional(),
-  email: userEmailSchema.optional(),
-  password: userPasswordSchema.optional(),
-}).refine((data) => Object.keys(data).length > 0, {
-  message: "At least one field must be provided",
-});
+export const updateOwnUserSchema = updateUserFieldsSchema.refine(
+  (data) => Object.keys(data).length > 0,
+  { message: "At least one field must be provided" },
+);
 
-export const updateUserSchema = updateOwnUserSchema.extend({
+export const updateUserSchema = updateUserFieldsSchema.extend({
   role: z.string().trim().min(1).optional(),
-});
+}).refine(
+  (data) => Object.keys(data).length > 0,
+  { message: "At least one field must be provided" },
+);
 
 export const findUsersByFiltersSchema = z.object({
   name: z.string().trim().min(1).optional(),

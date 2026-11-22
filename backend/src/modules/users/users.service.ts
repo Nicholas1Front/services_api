@@ -24,24 +24,6 @@ const ensureAllowedRole = (role: string) => {
   }
 };
 
-const handlePrismaError = (error: unknown): never => {
-  if (error && typeof error === "object" && "code" in error) {
-    if (error.code === "P2002") {
-      throw new AppError("Email is already in use", 409, "EMAIL_ALREADY_EXISTS");
-    }
-
-    if (error.code === "P2003") {
-      throw new AppError("User has related records and cannot be deleted", 409, "USER_HAS_RELATED_RECORDS");
-    }
-
-    if (error.code === "P2025") {
-      throw new AppError("User not found", 404, "USER_NOT_FOUND");
-    }
-  }
-
-  throw error;
-};
-
 export const usersService = {
   async createUser(actor: AuthenticatedUser, input: CreateUserInput) {
     ensureAdmin(actor);
@@ -49,16 +31,12 @@ export const usersService = {
 
     const passwordHash = await bcrypt.hash(input.password, PASSWORD_SALT_ROUNDS);
 
-    try {
-      return await usersRepository.create({
-        name: input.name,
-        email: input.email,
-        passwordHash,
-        role: input.role,
-      });
-    } catch (error) {
-      handlePrismaError(error);
-    }
+    return usersRepository.create({
+      name: input.name,
+      email: input.email,
+      passwordHash,
+      role: input.role,
+    });
   },
 
   async getOwnProfile(actor: AuthenticatedUser) {
@@ -106,11 +84,7 @@ export const usersService = {
       role: input.role,
     });
 
-    try {
-      return await usersRepository.update(userId, data);
-    } catch (error) {
-      handlePrismaError(error);
-    }
+    return usersRepository.update(userId, data);
   },
 
   async findUsersByFilters(actor: AuthenticatedUser, filters: FindUsersByFiltersInput) {
@@ -148,10 +122,6 @@ export const usersService = {
       throw new AppError("You cannot delete your own account", 400, "SELF_DELETE_NOT_ALLOWED");
     }
 
-    try {
-      return await usersRepository.delete(userId);
-    } catch (error) {
-      handlePrismaError(error);
-    }
+    return usersRepository.delete(userId);
   },
 };

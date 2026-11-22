@@ -64,7 +64,7 @@ export const findUsersByFilters: RequestHandler = async (req, res) => {
 };
 
 export const findUserById: RequestHandler = async (req, res) => {
-  const userId = req.params.id;
+  const userId = req.params.id as string;
 
   if (!userId) {
     throw new AppError("User ID is required", 400, "USER_ID_REQUIRED");
@@ -79,7 +79,7 @@ export const findUserById: RequestHandler = async (req, res) => {
 };
 
 export const updateUser: RequestHandler = async (req, res) => {
-  const userId = req.params.id;
+  const userId = req.params.id as string;
 
   if (!userId) {
     throw new AppError("User ID is required", 400, "USER_ID_REQUIRED");
@@ -100,7 +100,7 @@ export const updateUser: RequestHandler = async (req, res) => {
 };
 
 export const deleteUser: RequestHandler = async (req, res) => {
-  const userId = req.params.id;
+  const userId = req.params.id as string;
 
   if (!userId) {
     throw new AppError("User ID is required", 400, "USER_ID_REQUIRED");

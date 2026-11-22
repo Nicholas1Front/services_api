@@ -24,7 +24,7 @@ export const updateOwnProfile: RequestHandler = async (req, res) => {
     throw new AppError("Invalid user data", 400, "INVALID_USER_DATA");
   }
 
-  const user = await usersService.updateOwnProfile(req.user!, parsedBody.data);
+  const user = await usersService.updateUser(req.user!, req.user!.id, parsedBody.data);
 
   res.status(200).json({
     status: "success",

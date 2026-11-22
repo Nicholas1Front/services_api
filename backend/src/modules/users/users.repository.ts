@@ -25,13 +25,6 @@ export const usersRepository = {
     });
   },
 
-  findRoleById(id: string) {
-    return prisma.user.findUnique({
-      where: { id },
-      select: { role: true },
-    });
-  },
-
   findByFilters(filters: FindUsersByFiltersInput) {
     const where = {
       ...(filters.name && {

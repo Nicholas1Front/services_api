@@ -8,6 +8,7 @@ import { errorMiddleware } from "./config/error.middleware.js";
 import { logger } from "./config/logger.js";
 import { prisma } from "./config/prisma.js";
 import { redis } from "./config/redis.js";
+import routes from "./routes/index.js";
 
 const app = express();
 
@@ -54,6 +55,8 @@ app.get("/health/ready", async (_req, res) => {
     });
   }
 });
+
+app.use("/api", routes);
 
 // Keep the error handler after every route and middleware.
 app.use(errorMiddleware);

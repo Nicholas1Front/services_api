@@ -43,13 +43,17 @@ const ensureTaskVisibility = (
     creatorId: string;
     assignedToId: string | null;
     visibility: { role: string }[];
+    service: { visibility: { role: string }[] };
   },
 ) => {
   const canView =
     actor.role === "ADMIN" ||
     actor.id === task.creatorId ||
     actor.id === task.assignedToId ||
-    task.visibility.some((item) => item.role === actor.role);
+    (
+      task.visibility.some((item) => item.role === actor.role) &&
+      task.service.visibility.some((item) => item.role === actor.role)
+    );
 
   if (!canView) {
     throw new AppError("Task not found", 404, "TASK_NOT_FOUND");
@@ -68,6 +72,18 @@ export const tasksService = {
     }
 
     ensureTaskCreator(actor, service.ownerId);
+
+    const unavailableRoles = input.roles.filter(
+      (role) => !service.visibility.some((item) => item.role === role),
+    );
+
+    if (unavailableRoles.length > 0) {
+      throw new AppError(
+        "Task roles must be enabled for the service",
+        400,
+        "TASK_ROLES_NOT_ALLOWED",
+      );
+    }
 
     const { serviceId, roles, ...taskData } = input;
 

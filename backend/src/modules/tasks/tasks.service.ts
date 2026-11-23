@@ -59,10 +59,9 @@ const ensureTaskVisibility = (
 export const tasksService = {
   async createTask(
     actor: AuthenticatedUser,
-    serviceId: string,
     input: CreateTaskInput,
   ) {
-    const service = await servicesRepository.findById(serviceId);
+    const service = await servicesRepository.findById(input.serviceId);
 
     if (!service) {
       throw new AppError("Service not found", 404, "SERVICE_NOT_FOUND");
@@ -70,7 +69,7 @@ export const tasksService = {
 
     ensureTaskCreator(actor, service.ownerId);
 
-    const { roles, ...taskData } = input;
+    const { serviceId, roles, ...taskData } = input;
 
     return tasksRepository.create({
       ...taskData,

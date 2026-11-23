@@ -10,6 +10,7 @@ const ensureUniqueRoles = (roles: string[]) =>
   new Set(roles).size === roles.length;
 
 export const createTaskSchema = z.object({
+  serviceId: z.string().uuid(),
   title: taskTitleSchema,
   description: taskDescriptionSchema,
   status: z.enum(allowedTaskStatus).default("PENDING"),

@@ -7,6 +7,11 @@ const taskInclude = {
       id: true,
       title: true,
       ownerId: true,
+      visibility: {
+        select: {
+          role: true,
+        },
+      },
     },
   },
   creator: {
@@ -77,7 +82,12 @@ export const tasksRepository = {
         OR: [
           { creatorId: actor.id },
           { assignedToId: actor.id },
-          { visibility: { some: { role: actor.role } } },
+          {
+            AND: [
+              { visibility: { some: { role: actor.role } } },
+              { service: { visibility: { some: { role: actor.role } } } },
+            ],
+          },
         ],
       }),
     };

@@ -124,7 +124,12 @@ export const tasksService = {
     input: UpdateTaskInput,
   ) {
     const task = await findTaskOrFail(taskId);
-    ensureTaskEditor(actor, task);
+
+    if (Object.hasOwn(input, "assignedToId")) {
+      ensureTaskCreator(actor, task.creatorId);
+    } else {
+      ensureTaskEditor(actor, task);
+    }
 
     return tasksRepository.update(taskId, input);
   },

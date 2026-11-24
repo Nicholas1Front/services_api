@@ -7,14 +7,11 @@ const taskInclude = {
       id: true,
       title: true,
       ownerId: true,
-<<<<<<< HEAD
-=======
       visibility: {
         select: {
           role: true,
         },
       },
->>>>>>> origin/feat/notes-module
     },
   },
   creator: {
@@ -85,16 +82,13 @@ export const tasksRepository = {
         OR: [
           { creatorId: actor.id },
           { assignedToId: actor.id },
-<<<<<<< HEAD
           { visibility: { some: { role: actor.role } } },
-=======
           {
             AND: [
               { visibility: { some: { role: actor.role } } },
               { service: { visibility: { some: { role: actor.role } } } },
             ],
           },
->>>>>>> origin/feat/notes-module
         ],
       }),
     };

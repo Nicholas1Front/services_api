@@ -43,24 +43,18 @@ const ensureTaskVisibility = (
     creatorId: string;
     assignedToId: string | null;
     visibility: { role: string }[];
-<<<<<<< HEAD
-=======
     service: { visibility: { role: string }[] };
->>>>>>> origin/feat/notes-module
   },
 ) => {
   const canView =
     actor.role === "ADMIN" ||
     actor.id === task.creatorId ||
     actor.id === task.assignedToId ||
-<<<<<<< HEAD
     task.visibility.some((item) => item.role === actor.role);
-=======
     (
       task.visibility.some((item) => item.role === actor.role) &&
       task.service.visibility.some((item) => item.role === actor.role)
     );
->>>>>>> origin/feat/notes-module
 
   if (!canView) {
     throw new AppError("Task not found", 404, "TASK_NOT_FOUND");
@@ -80,8 +74,6 @@ export const tasksService = {
 
     ensureTaskCreator(actor, service.ownerId);
 
-<<<<<<< HEAD
-=======
     const unavailableRoles = input.roles.filter(
       (role) => !service.visibility.some((item) => item.role === role),
     );
@@ -94,7 +86,6 @@ export const tasksService = {
       );
     }
 
->>>>>>> origin/feat/notes-module
     const { serviceId, roles, ...taskData } = input;
 
     return tasksRepository.create({
@@ -134,16 +125,13 @@ export const tasksService = {
     input: UpdateTaskInput,
   ) {
     const task = await findTaskOrFail(taskId);
-<<<<<<< HEAD
     ensureTaskEditor(actor, task);
-=======
 
     if (Object.hasOwn(input, "assignedToId")) {
       ensureTaskCreator(actor, task.creatorId);
     } else {
       ensureTaskEditor(actor, task);
     }
->>>>>>> origin/feat/notes-module
 
     return tasksRepository.update(taskId, input);
   },

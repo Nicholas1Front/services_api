@@ -63,11 +63,10 @@ export const notesRepository = {
       }),
       ...(filters.entityId && { entityId: filters.entityId }),
       ...(filters.entityTable && { entityTable: filters.entityTable }),
+      ...(actor.role !== "ADMIN" ? { userId: actor.id } : {}),
       ...(actor.role === "ADMIN" && filters.userId
         ? { userId: filters.userId }
-        : actor.role !== "ADMIN"
-          ? { userId: actor.id }
-          : {}),
+        : {}),
     };
 
     const skip = (filters.page - 1) * filters.limit;

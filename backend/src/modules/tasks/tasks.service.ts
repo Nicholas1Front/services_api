@@ -50,11 +50,8 @@ const ensureTaskVisibility = (
     actor.role === "ADMIN" ||
     actor.id === task.creatorId ||
     actor.id === task.assignedToId ||
-    task.visibility.some((item) => item.role === actor.role);
-    (
-      task.visibility.some((item) => item.role === actor.role) &&
-      task.service.visibility.some((item) => item.role === actor.role)
-    );
+    (task.visibility.some((item) => item.role === actor.role) &&
+      task.service.visibility.some((item) => item.role === actor.role));
 
   if (!canView) {
     throw new AppError("Task not found", 404, "TASK_NOT_FOUND");

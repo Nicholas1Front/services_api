@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authRoutes } from "../modules/auth/auth.routes.js";
+import { dashboardRoutes } from "../modules/dashboard/dashboard.routes.js";
 import { notesRoutes } from "../modules/notes/notes.routes.js";
 import { servicesRoutes } from "../modules/services/services.routes.js";
 import { tasksRoutes } from "../modules/tasks/tasks.routes.js";
@@ -12,5 +13,6 @@ router.use("/users", usersRoutes);
 router.use("/services", servicesRoutes);
 router.use("/tasks", tasksRoutes);
 router.use("/notes", notesRoutes);
+router.use("/dashboard", dashboardRoutes);
 
 export default router;

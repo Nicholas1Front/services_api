@@ -115,10 +115,7 @@ export const dashboardRepository = {
           },
         },
         tasks: {
-          where: {
-            ...taskAccessWhere(actor),
-            status: { in: ["IN_PROGRESS", "COMPLETED"] },
-          },
+          where: taskAccessWhere(actor),
           orderBy: { updatedAt: "desc" },
           include: dashboardTaskInclude,
         },

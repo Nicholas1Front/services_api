@@ -82,7 +82,6 @@ export const tasksRepository = {
         OR: [
           { creatorId: actor.id },
           { assignedToId: actor.id },
-          { visibility: { some: { role: actor.role } } },
           {
             AND: [
               { visibility: { some: { role: actor.role } } },

@@ -1,5 +1,6 @@
 import { AppError } from "../../config/app-error.js";
 import type { AuthenticatedUser } from "../../types/auth.js";
+import { invalidateDashboardCache } from "../dashboard/dashboard.cache.js";
 import type {
   CreateNoteInput,
   FindNotesByFiltersInput,
@@ -43,10 +44,14 @@ export const notesService = {
       throw new AppError("Referenced entity not found", 404, "NOTE_ENTITY_NOT_FOUND");
     }
 
-    return notesRepository.create({
+    const note = await notesRepository.create({
       ...input,
       userId: actor.id,
     });
+
+    await invalidateDashboardCache();
+
+    return note;
   },
 
   async getNote(actor: AuthenticatedUser, noteId: string) {
@@ -80,13 +85,21 @@ export const notesService = {
     const note = await findNoteOrFail(noteId);
     ensureNoteOwner(actor, note.userId);
 
-    return notesRepository.update(noteId, input);
+    const updatedNote = await notesRepository.update(noteId, input);
+
+    await invalidateDashboardCache();
+
+    return updatedNote;
   },
 
   async deleteNote(actor: AuthenticatedUser, noteId: string) {
     const note = await findNoteOrFail(noteId);
     ensureNoteOwner(actor, note.userId);
 
-    return notesRepository.delete(noteId);
+    const deletedNote = await notesRepository.delete(noteId);
+
+    await invalidateDashboardCache();
+
+    return deletedNote;
   },
 };

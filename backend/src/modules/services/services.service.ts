@@ -1,5 +1,6 @@
 import { AppError } from "../../config/app-error.js";
 import type { AuthenticatedUser } from "../../types/auth.js";
+import { invalidateDashboardCache } from "../dashboard/dashboard.cache.js";
 import type {
   AddServiceVisibilityInput,
   CreateServiceInput,
@@ -38,10 +39,14 @@ export const servicesService = {
   async createService(actor: AuthenticatedUser, input: CreateServiceInput) {
     ensureAdmin(actor);
 
-    return servicesRepository.create({
+    const service = await servicesRepository.create({
       ...input,
       ownerId: actor.id,
     });
+
+    await invalidateDashboardCache();
+
+    return service;
   },
 
   async getService(actor: AuthenticatedUser, serviceId: string) {
@@ -81,12 +86,22 @@ export const servicesService = {
     input: UpdateServiceInput,
   ) {
     ensureAdmin(actor);
-    return servicesRepository.update(serviceId, input);
+
+    const updatedService = await servicesRepository.update(serviceId, input);
+
+    await invalidateDashboardCache();
+
+    return updatedService;
   },
 
   async deleteService(actor: AuthenticatedUser, serviceId: string) {
     ensureAdmin(actor);
-    return servicesRepository.delete(serviceId);
+
+    const deletedService = await servicesRepository.delete(serviceId);
+
+    await invalidateDashboardCache();
+
+    return deletedService;
   },
 
   async addServiceVisibility(
@@ -98,6 +113,7 @@ export const servicesService = {
     ensureServiceOwner(actor, service.ownerId);
 
     await servicesRepository.addVisibility(serviceId, input.roles);
+    await invalidateDashboardCache();
 
     return servicesRepository.findById(serviceId);
   },
@@ -110,6 +126,13 @@ export const servicesService = {
     const service = await findServiceOrFail(serviceId);
     ensureServiceOwner(actor, service.ownerId);
 
-    return servicesRepository.updateVisibility(serviceId, input.roles);
+    const updatedVisibility = await servicesRepository.updateVisibility(
+      serviceId,
+      input.roles,
+    );
+
+    await invalidateDashboardCache();
+
+    return updatedVisibility;
   },
 };

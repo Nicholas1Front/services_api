@@ -1,5 +1,6 @@
 import { AppError } from "../../config/app-error.js";
 import type { AuthenticatedUser } from "../../types/auth.js";
+import { invalidateDashboardCache } from "../dashboard/dashboard.cache.js";
 import { servicesRepository } from "../services/services.repository.js";
 import type {
   CreateTaskInput,
@@ -85,12 +86,16 @@ export const tasksService = {
 
     const { serviceId, roles, ...taskData } = input;
 
-    return tasksRepository.create({
+    const task = await tasksRepository.create({
       ...taskData,
       serviceId,
       creatorId: service.ownerId,
       roles,
     });
+
+    await invalidateDashboardCache();
+
+    return task;
   },
 
   async getTask(actor: AuthenticatedUser, taskId: string) {
@@ -130,7 +135,11 @@ export const tasksService = {
       ensureTaskEditor(actor, task);
     }
 
-    return tasksRepository.update(taskId, input);
+    const updatedTask = await tasksRepository.update(taskId, input);
+
+    await invalidateDashboardCache();
+
+    return updatedTask;
   },
 
   async updateTaskDeliveryDate(
@@ -141,13 +150,24 @@ export const tasksService = {
     const task = await findTaskOrFail(taskId);
     ensureTaskCreator(actor, task.creatorId);
 
-    return tasksRepository.updateDeliveryDate(taskId, input.deliveryDate);
+    const updatedTask = await tasksRepository.updateDeliveryDate(
+      taskId,
+      input.deliveryDate,
+    );
+
+    await invalidateDashboardCache();
+
+    return updatedTask;
   },
 
   async deleteTask(actor: AuthenticatedUser, taskId: string) {
     const task = await findTaskOrFail(taskId);
     ensureTaskCreator(actor, task.creatorId);
 
-    return tasksRepository.delete(taskId);
+    const deletedTask = await tasksRepository.delete(taskId);
+
+    await invalidateDashboardCache();
+
+    return deletedTask;
   },
 };
